@@ -57,7 +57,6 @@ public class Customer implements Comparable<Customer> {
         if (o == null || getClass() != o.getClass()) return false;
 
         Customer customer = (Customer) o;
-
         return id == customer.id;
     }
 
