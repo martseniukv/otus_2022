@@ -1,6 +1,7 @@
 package ru.otus.homework.test;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.otus.homework.annotations.After;
 import ru.otus.homework.annotations.Before;
 import ru.otus.homework.annotations.Test;
@@ -14,8 +15,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
 public class SimplePersonServiceTest {
+
+    private static final Logger log = LoggerFactory.getLogger(SimplePersonServiceTest.class);
 
     private SimplePersonService simplePersonService;
 

@@ -1,15 +1,17 @@
 package ru.otus.homework.test;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.otus.homework.annotations.After;
 import ru.otus.homework.annotations.Before;
 import ru.otus.homework.annotations.Test;
 import ru.otus.homework.service.impl.SimpleStringService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
 public class ErrorStringServiceTest {
 
+    private static final Logger log = LoggerFactory.getLogger(ErrorStringServiceTest.class);
     @Test
     private void getReverseString(){
 
@@ -26,6 +28,12 @@ public class ErrorStringServiceTest {
     @Before
     private void setUp(){
         log.info("Before ErrorStringServiceTest");
+        throw new UnsupportedOperationException();
+    }
+
+    @After
+    private void tearDown(){
+        log.info("After ErrorStringServiceTest");
         throw new UnsupportedOperationException();
     }
 }
