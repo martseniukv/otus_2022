@@ -1,9 +1,7 @@
 package ru.otus.dataprocessor.loader.impl;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import ru.otus.dataprocessor.deserializer.MeasurementDeserializer;
 import ru.otus.dataprocessor.exception.FileProcessException;
 import ru.otus.dataprocessor.loader.Loader;
 import ru.otus.model.Measurement;
@@ -22,9 +20,6 @@ public class GsonResourcesFileLoader implements Loader {
     private final Gson gson;
 
     public GsonResourcesFileLoader(String fileName) {
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(Measurement.class, new MeasurementDeserializer());
-
         this.fileName = fileName;
         this.gson = new Gson();
     }
