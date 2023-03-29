@@ -11,15 +11,16 @@ import static java.util.Objects.requireNonNull;
 
 public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
 
-    private static final String QUESTION_MARK = "?";
-    private static final String SELECT_ALL_SQL = "SELECT %s FROM %s";
-    private static final String SELECT_BY_ID = "SELECT %s FROM %s WHERE %s = ?";
-    private static final String INSERTION_SQL = "INSERT INTO %s (%s) VALUES (%s)";
-    private static final String UPDATE_SQL = "UPDATE %s SET (%s) = (%s) WHERE %s = ?";
+    private static final String DELIMITER = ",";
 
     private final String allFields;
     private final String fieldsWithoutId;
     private final String placeHolderWithoutId;
+
+    private final String insertSql;
+    private final String updateSql;
+    private final String findAllSql;
+    private final String findByIdSql;
 
     private final EntityClassMetaData<T> entityClassMetaDataClient;
 
@@ -30,52 +31,71 @@ public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
         allFields = getAllFields(entityClassMetaDataClient);
         fieldsWithoutId = getFieldsWithoutId(entityClassMetaDataClient);
         placeHolderWithoutId = getPlaceHolderWithoutId(entityClassMetaDataClient);
+        insertSql = createInsertSql();
+        updateSql = createUpdateSql();
+        findAllSql = createFindAllSql();
+        findByIdSql = createFindByIdSql();
     }
 
     @Override
     public String getSelectAllSql() {
-        return format(SELECT_ALL_SQL, allFields, entityClassMetaDataClient.getName());
+        return findAllSql;
     }
 
     @Override
     public String getSelectByIdSql() {
-        final String tableName = entityClassMetaDataClient.getName();
-        final String idFiledName = entityClassMetaDataClient.getIdField().getName();
-        return format(SELECT_BY_ID, allFields, tableName, idFiledName);
+        return findByIdSql;
     }
 
     @Override
     public String getInsertSql() {
-        final String tableName = entityClassMetaDataClient.getName();
-        return format(INSERTION_SQL, tableName, fieldsWithoutId, placeHolderWithoutId);
+        return insertSql;
     }
 
     @Override
     public String getUpdateSql() {
+        return updateSql;
+    }
 
+    private String createFindByIdSql() {
         final String tableName = entityClassMetaDataClient.getName();
         final String idFiledName = entityClassMetaDataClient.getIdField().getName();
-        return format(UPDATE_SQL, tableName, fieldsWithoutId, placeHolderWithoutId, idFiledName);
+        return format("SELECT %s FROM %s WHERE %s = ?", allFields, tableName, idFiledName);
+    }
+
+    private String createFindAllSql() {
+        return format("SELECT %s FROM %s", allFields, entityClassMetaDataClient.getName());
+    }
+
+    public String createInsertSql() {
+        return format("INSERT INTO %s (%s) VALUES (%s)", entityClassMetaDataClient.getName(), fieldsWithoutId, placeHolderWithoutId);
+    }
+
+    public String createUpdateSql() {
+        final String tableName = entityClassMetaDataClient.getName();
+        final String idFiledName = entityClassMetaDataClient.getIdField().getName();
+        return format("UPDATE %s SET (%s) = (%s) WHERE %s = ?", tableName, fieldsWithoutId, placeHolderWithoutId, idFiledName);
     }
 
     private String getAllFields(EntityClassMetaData<T> entityClassMetaDataClient) {
         return entityClassMetaDataClient.getAllFields().stream()
                 .filter(Objects::nonNull)
                 .map(Field::getName)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(DELIMITER));
     }
 
     private String getFieldsWithoutId(EntityClassMetaData<T> entityClassMetaDataClient) {
         return entityClassMetaDataClient.getFieldsWithoutId().stream()
                 .filter(Objects::nonNull)
                 .map(Field::getName)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(DELIMITER));
     }
 
     private String getPlaceHolderWithoutId(EntityClassMetaData<T> entityClassMetaDataClient) {
+        String questionMark = "?";
         return entityClassMetaDataClient.getFieldsWithoutId().stream()
                 .filter(Objects::nonNull)
-                .map(m -> QUESTION_MARK)
-                .collect(Collectors.joining(","));
+                .map(m -> questionMark)
+                .collect(Collectors.joining(DELIMITER));
     }
 }

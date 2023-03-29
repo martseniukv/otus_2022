@@ -57,7 +57,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             } catch (SQLException e) {
                 throw new DataTemplateException(e);
             }
-        }).orElseThrow();
+        }).orElse(new ArrayList<>());
     }
 
     @Override

@@ -16,12 +16,14 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
     private final Class<T> type;
     private final Field idField;
     private final List<Field> fieldWithoutId;
+    private final Constructor<T> defaultConstructor;
 
     public EntityClassMetaDataImpl(Class<T> type) {
         requireNonNull(type);
         this.type = type;
         fieldWithoutId = getFieldWithoutId(type);
         idField = getFieldId(type);
+        defaultConstructor = getDefaultConstructor(type);
     }
 
     @Override
@@ -31,11 +33,7 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
 
     @Override
     public Constructor<T> getConstructor() {
-        try {
-            return type.getDeclaredConstructor();
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException("Entity must contain default constructor");
-        }
+        return defaultConstructor;
     }
 
     @Override
@@ -59,6 +57,14 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
         return stream(type.getDeclaredFields())
                 .filter(f -> !f.isAnnotationPresent(Id.class))
                 .collect(Collectors.toList());
+    }
+
+    private Constructor<T> getDefaultConstructor(Class<T> type) {
+        try {
+            return type.getDeclaredConstructor();
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException("Entity must contain default constructor");
+        }
     }
 
     private Field getFieldId(Class<T> type) {
