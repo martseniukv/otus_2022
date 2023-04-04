@@ -13,10 +13,6 @@ public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
 
     private static final String DELIMITER = ",";
 
-    private final String allFields;
-    private final String fieldsWithoutId;
-    private final String placeHolderWithoutId;
-
     private final String insertSql;
     private final String updateSql;
     private final String findAllSql;
@@ -28,13 +24,13 @@ public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
         requireNonNull(entityClassMetaDataClient);
         this.entityClassMetaDataClient = entityClassMetaDataClient;
 
-        allFields = getAllFields(entityClassMetaDataClient);
-        fieldsWithoutId = getFieldsWithoutId(entityClassMetaDataClient);
-        placeHolderWithoutId = getPlaceHolderWithoutId(entityClassMetaDataClient);
-        insertSql = createInsertSql();
-        updateSql = createUpdateSql();
-        findAllSql = createFindAllSql();
-        findByIdSql = createFindByIdSql();
+        String allFields = getAllFields(entityClassMetaDataClient);
+        String fieldsWithoutId = getFieldsWithoutId(entityClassMetaDataClient);
+        String placeHolderWithoutId = getPlaceHolderWithoutId(entityClassMetaDataClient);
+        insertSql = createInsertSql(fieldsWithoutId, placeHolderWithoutId);
+        updateSql = createUpdateSql(fieldsWithoutId, placeHolderWithoutId);
+        findAllSql = createFindAllSql(allFields);
+        findByIdSql = createFindByIdSql(allFields);
     }
 
     @Override
@@ -57,24 +53,25 @@ public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData {
         return updateSql;
     }
 
-    private String createFindByIdSql() {
+    private String createFindByIdSql(String allFields) {
         final String tableName = entityClassMetaDataClient.getName();
         final String idFiledName = entityClassMetaDataClient.getIdField().getName();
         return format("SELECT %s FROM %s WHERE %s = ?", allFields, tableName, idFiledName);
     }
 
-    private String createFindAllSql() {
+    private String createFindAllSql(String allFields) {
         return format("SELECT %s FROM %s", allFields, entityClassMetaDataClient.getName());
     }
 
-    public String createInsertSql() {
-        return format("INSERT INTO %s (%s) VALUES (%s)", entityClassMetaDataClient.getName(), fieldsWithoutId, placeHolderWithoutId);
+    private String createInsertSql(String fieldsWithoutId, String placeHolderWithoutId) {
+        final String name = entityClassMetaDataClient.getName();
+        return format("INSERT INTO %s (%s) VALUES (%s)", name, fieldsWithoutId, placeHolderWithoutId);
     }
 
-    public String createUpdateSql() {
+    private String createUpdateSql(String fieldsWithoutId, String placeHolderWithoutId) {
         final String tableName = entityClassMetaDataClient.getName();
-        final String idFiledName = entityClassMetaDataClient.getIdField().getName();
-        return format("UPDATE %s SET (%s) = (%s) WHERE %s = ?", tableName, fieldsWithoutId, placeHolderWithoutId, idFiledName);
+        final String idName = entityClassMetaDataClient.getIdField().getName();
+        return format("UPDATE %s SET (%s) = (%s) WHERE %s = ?", tableName, fieldsWithoutId, placeHolderWithoutId, idName);
     }
 
     private String getAllFields(EntityClassMetaData<T> entityClassMetaDataClient) {
