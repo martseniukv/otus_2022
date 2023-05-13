@@ -32,7 +32,6 @@ public class App {
         int current = maxBorder;
         int currentIteration = 0;
         while (currentIteration < countIteration) {
-
             try {
                 while (last == threadNum) {
                     this.wait();
