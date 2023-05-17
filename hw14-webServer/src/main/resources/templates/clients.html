@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Clients</title>
+    <script>
+            function getClientById() {
+                const clientIdTextBox = document.getElementById('clientIdTextBox');
+                const clientDataContainer = document.getElementById('clientDataContainer');
+                const id = clientIdTextBox.value;
+                fetch('api/clients/' + id)
+                    .then(response => response.json())
+                    .then(client => clientDataContainer.innerHTML = JSON.stringify(client, "", 4));
+            }
+        </script>
+</head>
+
+<body>
+<div>
+    <h4>Get client by ID</h4>
+    <input type="text" id = "clientIdTextBox" placeholder="Enter client ID">
+    <button onclick="getClientById()">Get</button>
+    <pre id = "clientDataContainer"></pre>
+</div>
+<div>
+    <h4>All clients</h4>
+    <table style="width: 1000px">
+        <thead>
+        <tr>
+            <td style="width: 200px">ID</td>
+            <td style="width: 200px">Name</td>
+            <td style="width: 200px">Address</td>
+            <td style="width: 400px">Phones</td>
+        </tr>
+        </thead>
+        <tbody>
+        <#list clients as client>
+        <tr>
+            <td style="width: 500px">${client.id}</td>
+            <td style="width: 500px">${client.name}</td>
+            <#if client.address??>
+            <td style="width: 500px">${client.address.street}</td>
+            <#else>
+            <td></td>
+        </#if>
+        <td style="width: 1000px">
+            <#if client.phones?has_content>
+<!--            <select>-->
+                <#list client.phones as phone>
+                    ${phone.number}
+            </#list>
+<!--            </select>-->
+        </#if>
+        </td>
+        </tr>
+        </#list>
+        </tbody>
+    </table>
+</div>
+<br/>
+<div>
+    <a href="/clients/add">Create new client</a>
+</div>
+</body>
+</html>
