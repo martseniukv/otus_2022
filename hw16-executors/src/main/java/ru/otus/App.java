@@ -3,14 +3,12 @@ package ru.otus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.concurrent.Executors.newFixedThreadPool;
-
 
 public class App {
 
     private static final Logger log = LoggerFactory.getLogger(App.class);
 
-    private static int last = 2;
+    private int last = 2;
 
     public static void main(String[] args) {
 
@@ -19,12 +17,9 @@ public class App {
         var countIteration = 2;
 
         var app = new App();
-        var executor = newFixedThreadPool(2);
 
-        executor.submit(() -> app.printNumbers(1, minBorder, maxBorder, countIteration));
-        executor.submit(() -> app.printNumbers(2, minBorder, maxBorder, countIteration));
-
-        executor.shutdown();
+        new Thread(() -> app.printNumbers(1, minBorder, maxBorder, countIteration)).start();
+        new Thread(() -> app.printNumbers(2, minBorder, maxBorder, countIteration)).start();
     }
 
     private synchronized void printNumbers(int threadNum, int minBorder, int maxBorder, int countIteration) {
