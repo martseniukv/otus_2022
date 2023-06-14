@@ -12,3 +12,7 @@ include 'hw12-spring-jdbc'
 include 'hw13-IoC'
 include 'hw14-webServer'
 include 'hw16-executors'
+
+include 'hw18-webFlux'
+include 'hw18-webFlux:client-service'
+include 'hw18-webFlux:datastore-service'
